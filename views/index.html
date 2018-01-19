@@ -1,0 +1,26 @@
+<html>
+<head>
+<title>Connect App - Home</title>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
+</head>
+<body>
+
+<div class="container">
+  <h1>
+    Connect App
+  </h1>
+  <p>
+    Please login or <a href="./create-profile">sign up</a>
+  </p>
+</div>
+
+<div class="container login-form">
+  <form method="POST" action="/authenticate">
+    <input type="text" placeholder="login" name="username" />
+    <input type="password" placeholder="password" name="password" />
+    <button type="submit" class="btn btn-success">log in</button>
+  </form>
+</div>
+</body>
+
+</html>

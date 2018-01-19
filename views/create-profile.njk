@@ -1,0 +1,25 @@
+{% extends "layout.njk" %}
+
+{% block content %}
+
+<div class="container login-form">
+  <form
+    method="POST"
+    action="/create_user">
+    <label>Choose a login</label>
+    <input
+      type="text"
+      placeholder="login"
+      name="login"
+    /><br />
+    <label>Choose a password</label>
+    <input
+      type="password"
+      placeholder="password"
+      name="password"
+    /><br />
+    <button type="submit" class="btn btn-success">Sign up</button>
+  </form>
+</div>
+
+{% endblock %}
