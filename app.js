@@ -5,7 +5,9 @@ const express = require('express');
 const app = express();
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
-const db = require("./db.js");
+const FacebookStrategy = require('passport-facebook').Strategy;
+const FB = require("fb");
+const db = require("./db");
 // Database settings
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -40,6 +42,23 @@ passport.use(
   }
 ));
 
+passport.use(
+  new FacebookStrategy(
+    {
+    clientID: process.env.CLIENT_ID,
+    clientSecret: process.env.CLIENT_SECRET,
+    callbackURL: process.env.REDIRECT_URI
+  },
+  function(accessToken, refreshToken, profile, callback) {
+      // console.log(profile);
+      db.findOrCreateFbUser(profile, pool)
+        .then(user => {
+          console.log("created", user)
+           callback(null, user);})
+        .catch(error => callback(error));
+  }
+));
+
 passport.serializeUser(function(user, callback) {
   return callback(null, user.id);
 });
@@ -60,15 +79,31 @@ app.get(
   "/profile/:id",
   require("connect-ensure-login").ensureLoggedIn("/login"),
   (request, result) => {
-    db.getUserById(request.params.id,pool)
+    db.getUserById(request.user.id,pool)
       .then( res => {
-        result.render("profile",{user : res.rows[0]} );
+        result.render("profile",{user : res} );
       })
       .catch(e => {
         console.log(e);
         result.redirect("/create-profile");
       });
 });
+
+app.get(
+  "/auth/facebook",
+  passport.authenticate("facebook", {
+    authType: "rerequest", // rerequest is here to ask again if login was denied once,
+    scope: ["email"]
+  })
+);
+
+app.get(
+  "/auth/callback",
+  passport.authenticate("facebook", { failureRedirect: "/" }),
+  function(request, result) {
+    result.redirect("/profile/" + request.user.id);
+  }
+);
 
 // ACTIONS
 app.post(
